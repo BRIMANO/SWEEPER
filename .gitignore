@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node (if you experiment later)
+node_modules/
+npm-debug.log*
+package-lock.json
+yarn.lock
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+
+# Secrets
+.env
+*.pem
