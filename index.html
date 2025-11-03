@@ -2,152 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Sweepbot — Secure Native Sweeper</title>
+  <title>Sweepbot — Secure Native Sweeper (v4.1 + profile keys)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Simple EVM sweep page to move native balance to a secure wallet. Runs fully in your browser." />
+  <meta name="description" content="Move your testnet or mainnet funds safely to a secure wallet — runs 100% in-browser with no backend." />
   <style>
-    :root {
-      --bg: #0f172a;
-      --panel: rgba(15,23,42,0.55);
-      --card: #0f172a;
-      --accent: #38bdf8;
-      --muted: #94a3b8;
-      --danger: #f43f5e;
-      --radius: 14px;
+    :root{
+      --bg:#0f172a;--muted:#94a3b8;--accent:#38bdf8;--danger:#f43f5e;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top, #1f2937 0%, #020617 55%, #020617 100%);
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      color: #e2e8f0;
-      display: flex;
-      flex-direction: column;
-    }
-    header {
-      backdrop-filter: blur(18px);
-      background: rgba(2,6,23,0.35);
-      border-bottom: 1px solid rgba(148,163,184,0.1);
-      padding: 14px 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .title {
-      font-weight: 600;
-      font-size: 1.05rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .pill {
-      background: rgba(56,189,248,0.1);
-      border: 1px solid rgba(56,189,248,0.35);
-      border-radius: 999px;
-      padding: 2px 10px;
-      font-size: 0.65rem;
-      color: #e2e8f0;
-    }
-    .wallet-status {
-      font-size: 0.75rem;
-      color: #94a3b8;
-    }
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: minmax(320px, 520px) minmax(260px, 1fr);
-      gap: 20px;
-      padding: 20px;
-    }
-    @media (max-width: 960px) {
-      main { grid-template-columns: 1fr; }
-    }
-    .card {
-      background: rgba(15,23,42,0.45);
-      border: 1px solid rgba(148,163,184,0.07);
-      border-radius: 16px;
-      padding: 18px 18px 16px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.25);
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 1rem;
-    }
-    label {
-      display: block;
-      font-size: 0.78rem;
-      margin-bottom: 4px;
-      color: #cbd5f5;
-    }
-    input[type=text], input[type=number] {
-      width: 100%;
-      padding: 9px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(148,163,184,0.2);
-      background: rgba(15,23,42,0.65);
-      color: #e2e8f0;
-      font-size: 0.8rem;
-      outline: none;
-    }
-    input::placeholder { color: rgba(148,163,184,0.55); }
-    .muted {
-      font-size: 0.69rem;
-      color: #94a3b8;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: none;
-      border-radius: 10px;
-      padding: 8px 14px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: transform 0.05s ease-out;
-    }
-    .btn:active { transform: translateY(1px); }
-    .btn-primary {
-      background: linear-gradient(120deg, #38bdf8 0%, #0ea5e9 100%);
-      color: #020617;
-    }
-    .btn-secondary {
-      background: rgba(148,163,184,0.12);
-      color: #e2e8f0;
-    }
-    .btn-danger {
-      background: rgba(244,63,94,0.12);
-      color: #f43f5e;
-    }
-    .actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    #log {
-      background: rgba(15,23,42,0.5);
-      border: 1px solid rgba(148,163,184,0.07);
-      border-radius: 14px;
-      height: 100%;
-      min-height: 260px;
-      padding: 10px;
-      font-family: ui-monospace, SFMono-Regular, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.68rem;
-      white-space: pre-wrap;
-      overflow-y: auto;
-      line-height: 1.3;
-    }
-    .tag-ok { color: #22c55e; font-weight: 600; }
-    .tag-warn { color: #f97316; font-weight: 600; }
-    footer {
-      text-align: center;
-      font-size: 0.65rem;
-      color: #64748b;
-      padding-bottom: 8px;
-    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at top,#1f2937 0%,#020617 55%,#020617 100%);min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#e2e8f0;display:flex;flex-direction:column}
+    header{backdrop-filter:blur(18px);background:rgba(2,6,23,0.35);border-bottom:1px solid rgba(148,163,184,0.1);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .title{font-weight:600;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+    .pill{background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.35);border-radius:999px;padding:2px 10px;font-size:0.65rem;color:#e2e8f0}
+    .wallet-status{font-size:0.75rem;color:var(--muted)}
+    select,input[type=text],input[type=number]{background:rgba(15,23,42,0.75);border:1px solid rgba(148,163,184,0.2);color:#e2e8f0;border-radius:10px;padding:6px 10px;font-size:0.8rem;outline:none}
+    main{flex:1;display:grid;grid-template-columns:minmax(320px,520px) minmax(260px,1fr);gap:20px;padding:20px}
+    @media(max-width:960px){main{grid-template-columns:1fr}}
+    .card{background:rgba(15,23,42,0.45);border:1px solid rgba(148,163,184,0.07);border-radius:16px;padding:18px 18px 16px;box-shadow:0 20px 45px rgba(0,0,0,0.25)}
+    h2{margin-top:0;font-size:1rem} label{display:block;font-size:0.78rem;margin-bottom:4px;color:#cbd5f5}
+    input::placeholder{color:rgba(148,163,184,0.55)}
+    .muted{font-size:0.69rem;color:var(--muted)}
+    .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:8px 14px;font-size:0.78rem;font-weight:500;cursor:pointer;transition:transform .05s}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(120deg,var(--accent) 0%,#0ea5e9 100%);color:#020617}
+    .btn-secondary{background:rgba(148,163,184,0.12);color:#e2e8f0}
+    .btn-danger{background:rgba(244,63,94,0.12);color:var(--danger)}
+    .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    #log{background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.07);border-radius:14px;height:100%;min-height:260px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.68rem;white-space:pre-wrap;overflow-y:auto;line-height:1.3}
+    .tag-ok{color:#22c55e;font-weight:600}.tag-warn{color:#f97316;font-weight:600}
+    footer{text-align:center;font-size:0.65rem;color:#64748b;padding-bottom:8px}
+    .small-actions{margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}
+    .small-btn{font-size:0.72rem;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,0.08);background:rgba(15,23,42,0.6);color:#e2e8f0;cursor:pointer}
+    .meta-row{display:flex;gap:8px;align-items:center}
+    .meta-row label{margin:0;font-size:0.72rem;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -156,25 +43,51 @@
       <span>🌀 Sweepbot</span>
       <span class="pill">Native-only • client-side</span>
     </div>
-    <div class="wallet-status" id="walletStatus">Not connected</div>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+      <select id="networkSelect">
+        <option value="1">Ethereum Mainnet</option>
+        <option value="56">BNB Smart Chain</option>
+        <option value="137">Polygon</option>
+        <option value="10">Optimism</option>
+        <option value="42161">Arbitrum One</option>
+        <option value="43114">Avalanche C-Chain</option>
+        <option value="250">Fantom</option>
+        <option value="8453">Base</option>
+        <option value="11155111">Sepolia (Testnet)</option>
+      </select>
+      <div class="wallet-status" id="walletStatus">Not connected</div>
+    </div>
   </header>
 
   <main>
-    <!-- LEFT COLUMN: controls -->
     <div class="card">
       <h2>1. Connect & configure</h2>
-      <p class="muted">Connect your EVM wallet, set your secure address, test in DRY-RUN, then sweep.</p>
+      <p class="muted">Connect your EVM wallet, set your secure address (auto-filled if saved), test in DRY-RUN, then proceed.</p>
 
       <div style="margin-top:12px;">
         <label for="dest">Secure destination address</label>
         <input id="dest" type="text" placeholder="0xYourSecureWalletAddress" />
-        <p class="muted">⚠️ Double-check. Sweeps can’t be undone.</p>
+        <div class="small-actions">
+          <button id="saveDefaultBtn" class="small-btn">💾 Save as default (local)</button>
+          <button id="clearDefaultBtn" class="small-btn">🧹 Clear saved default</button>
+          <span class="muted" style="align-self:center;font-size:0.72rem;">(Saved locally in your browser only)</span>
+        </div>
+        <p class="muted">⚠️ Double-check. Transactions can’t be undone.</p>
       </div>
 
       <div style="margin-top:12px;">
-        <label for="minThresh">Minimum balance to sweep (in ETH)</label>
+        <label for="minThresh">Minimum balance to proceed (in ETH)</label>
         <input id="minThresh" type="number" step="0.000001" value="0.01" />
         <p class="muted">If your wallet has less than this, the bot will skip.</p>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="meta-row">
+          <label for="profileKey">Profile key (localStorage)</label>
+          <input id="profileKey" type="text" style="width:260px;padding:6px 10px;border-radius:8px" />
+        </div>
+        <p class="muted" style="margin-top:6px">Use a different key per browser/profile to separate saved defaults (example: <code>sweepbot_default_dest_v1</code>, <code>sweepbot_default_dest_work</code>).</p>
       </div>
 
       <div class="actions" style="margin-top:14px;">
@@ -182,32 +95,31 @@
         <button class="btn btn-secondary" id="toggleDryRunBtn">🧪 Dry-run: <span id="dryRunState">ON</span></button>
       </div>
 
-      <hr style="border:0; border-top:1px solid rgba(148,163,184,0.08); margin:16px 0;" />
+      <hr style="border:0;border-top:1px solid rgba(148,163,184,0.08);margin:16px 0" />
 
-      <h2>2. Sweep</h2>
+      <h2>2. Proceed</h2>
       <p class="muted">This will calculate <em>balance − gas</em> and send the rest to your secure address.</p>
       <div class="actions">
-        <button class="btn btn-danger" id="sweepBtn" disabled>⚡ Sweep native</button>
+        <button class="btn btn-danger" id="sweepBtn" disabled>🚀 Proceed</button>
         <button class="btn btn-secondary" id="checkBalanceBtn" disabled>👁 Check balance</button>
       </div>
 
       <p id="status" class="muted" style="margin-top:14px;">Status: waiting…</p>
     </div>
 
-    <!-- RIGHT COLUMN: log -->
-    <div class="card" style="display:flex; flex-direction:column;">
+    <div class="card" style="display:flex;flex-direction:column">
       <h2>Activity log</h2>
       <p class="muted">Everything the page does will show up here.</p>
-      <pre id="log">[log] Ready. Connect your wallet to begin.</pre>
+      <pre id="log">[log] Ready. Secure address will auto-fill if saved for the active profile key.</pre>
     </div>
   </main>
 
   <footer>Runs fully in your browser. No API keys. Test on a testnet first.</footer>
 
-  <!-- Ethers.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.2/dist/ethers.min.js"></script>
-  <script>
-  (function() {
+  <script type="module">
+    import { BrowserProvider, isAddress, parseEther, formatEther } from "https://cdn.jsdelivr.net/npm/ethers@6.9.2/dist/ethers.min.js";
+
+    // Elements
     const walletStatus = document.getElementById('walletStatus');
     const statusText = document.getElementById('status');
     const logBox = document.getElementById('log');
@@ -218,155 +130,206 @@
     const checkBalanceBtn = document.getElementById('checkBalanceBtn');
     const destInput = document.getElementById('dest');
     const minThreshInput = document.getElementById('minThresh');
+    const networkSelect = document.getElementById('networkSelect');
+    const saveDefaultBtn = document.getElementById('saveDefaultBtn');
+    const clearDefaultBtn = document.getElementById('clearDefaultBtn');
+    const profileKeyInput = document.getElementById('profileKey');
 
-    let provider = null;
-    let signer = null;
-    let account = null;
-    let dryRun = true;
+    // State
+    let provider = null, signer = null, account = null, dryRun = true;
+    let lastBalance = null, balanceTimer = null;
+    // default profile key (editable in UI)
+    const DEFAULT_KEY = 'sweepbot_default_dest_v1';
 
-    function log(msg) {
+    const log = msg => {
       const line = `[${new Date().toLocaleTimeString()}] ${msg}\n`;
       logBox.textContent = line + logBox.textContent;
-    }
-    function setStatus(msg, type="info") {
-      if (type === "ok") statusText.innerHTML = `<span class="tag-ok">${msg}</span>`;
-      else if (type === "warn") statusText.innerHTML = `<span class="tag-warn">${msg}</span>`;
-      else statusText.textContent = msg;
+    };
+    const setStatus = (msg, type="info") => {
+      statusText.innerHTML = type==="ok" ? `<span class='tag-ok'>${msg}</span>` :
+                             type==="warn" ? `<span class='tag-warn'>${msg}</span>` : msg;
+    };
+
+    // Helper: get the active localStorage key (from input or default)
+    function getActiveKey() {
+      const k = (profileKeyInput.value || '').trim();
+      return k ? k : DEFAULT_KEY;
     }
 
-    // Toggle dry-run
-    toggleDryRunBtn.addEventListener('click', () => {
-      dryRun = !dryRun;
-      dryRunState.textContent = dryRun ? "ON" : "OFF";
-      log(dryRun ? "Dry-run ENABLED — txs will NOT be sent." : "Dry-run DISABLED — txs WILL be sent if you sweep.");
+    // Load saved default for active key on startup
+    (function loadDefaultForActiveKey() {
+      try {
+        profileKeyInput.value = DEFAULT_KEY;
+        const active = getActiveKey();
+        const saved = localStorage.getItem(active);
+        if (saved) {
+          destInput.value = saved;
+          log(`Loaded saved secure address for profile key "${active}" (editable).`);
+        } else {
+          destInput.value = '';
+          log(`No saved address for profile key "${active}".`);
+        }
+      } catch (e) {
+        console.warn("localStorage read failed", e);
+      }
+    })();
+
+    // When profile key changes, reload the associated saved address
+    profileKeyInput.addEventListener('change', () => {
+      try {
+        const key = getActiveKey();
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          destInput.value = saved;
+          log(`Loaded saved secure address for profile key "${key}".`);
+        } else {
+          destInput.value = '';
+          log(`No saved address for profile key "${key}".`);
+        }
+      } catch (e) {
+        console.warn(e);
+      }
     });
 
-    // Connect wallet
-    connectBtn.addEventListener('click', async () => {
+    // Save current dest to active key
+    saveDefaultBtn.onclick = () => {
+      const v = destInput.value.trim();
+      if (!v) return alert("Paste the secure address into the box, then click Save.");
+      if (!isAddress(v)) return alert("That doesn't look like a valid EVM address.");
       try {
-        if (!window.ethereum) {
-          setStatus("No wallet detected. Install MetaMask.", "warn");
-          log("No injected wallet found.");
-          return;
+        const active = getActiveKey();
+        localStorage.setItem(active, v);
+        log(`Secure address saved locally under key "${active}".`);
+        alert("Saved locally in this browser/profile.");
+      } catch (e) {
+        alert("Failed to save locally: " + e.message);
+      }
+    };
+
+    // Clear saved dest for active key
+    clearDefaultBtn.onclick = () => {
+      try {
+        const active = getActiveKey();
+        localStorage.removeItem(active);
+        destInput.value = '';
+        log(`Saved address cleared for profile key "${active}".`);
+        alert("Cleared saved address for this profile key.");
+      } catch (e) {
+        alert("Failed to clear: " + e.message);
+      }
+    };
+
+    // Dry-run toggle
+    toggleDryRunBtn.onclick = () => {
+      dryRun = !dryRun;
+      dryRunState.textContent = dryRun ? "ON" : "OFF";
+      log(dryRun ? "Dry-run ENABLED — txs will NOT be sent." : "Dry-run DISABLED — txs WILL be sent if you proceed.");
+    };
+
+    // Network switching helper
+    async function switchNetwork(chainId) {
+      try {
+        await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x" + Number(chainId).toString(16) }] });
+        log(`Switched to network ${chainId}`);
+      } catch (err) {
+        if (err && err.code === 4902) log(`Network ${chainId} not found in wallet. Add it manually.`);
+        else log(`Network switch error: ${err?.message || err}`);
+      }
+    }
+    networkSelect.onchange = () => {
+      const chainId = networkSelect.value;
+      if (window.ethereum) switchNetwork(chainId);
+      else log("Cannot switch network — no wallet detected.");
+    };
+
+    // Balance fetch
+    async function fetchAndShowBalance(silent = false) {
+      if (!provider || !account) return;
+      try {
+        const bal = await provider.getBalance(account);
+        const eth = formatEther(bal);
+        if (!silent || lastBalance === null || eth !== lastBalance) {
+          log(`Balance: ${eth} ETH`);
+          setStatus(`Balance: ${eth} ETH`, "ok");
         }
-        provider = new ethers.BrowserProvider(window.ethereum);
+        lastBalance = eth;
+      } catch (err) {
+        if (!silent) log("Balance refresh error: " + err.message);
+      }
+    }
+
+    // Connect wallet
+    connectBtn.onclick = async () => {
+      try {
+        if (!window.ethereum) return setStatus("No wallet detected. Install MetaMask.", "warn");
+        provider = new BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         signer = await provider.getSigner();
         account = await signer.getAddress();
         const net = await provider.getNetwork();
         walletStatus.textContent = `Connected: ${account.slice(0,6)}…${account.slice(-4)} on ${net.name}`;
-        log(`Connected to ${account} on network ${net.name} (chainId ${net.chainId})`);
-        setStatus("Wallet connected. You can sweep now.", "ok");
+        log(`Connected to ${account} on ${net.name} (chainId ${net.chainId})`);
+        setStatus("Wallet connected. You can proceed.", "ok");
         sweepBtn.disabled = false;
         checkBalanceBtn.disabled = false;
+        // auto-select dropdown
+        [...networkSelect.options].forEach(opt => { if (Number(opt.value) === Number(net.chainId)) opt.selected = true; });
+        // show balance immediately
+        await fetchAndShowBalance(false);
+        // start auto refresh
+        if (balanceTimer) clearInterval(balanceTimer);
+        balanceTimer = setInterval(() => fetchAndShowBalance(true), 30000);
       } catch (err) {
-        log("Connect error: " + err.message);
+        log("Connect error: " + (err?.message || err));
         setStatus("Connect failed — see log.", "warn");
       }
-    });
+    };
 
-    // Check balance
-    checkBalanceBtn.addEventListener('click', async () => {
+    // Manual balance check
+    checkBalanceBtn.onclick = async () => { await fetchAndShowBalance(false); };
+
+    // Proceed / sweep
+    sweepBtn.onclick = async () => {
       try {
-        if (!signer || !provider) {
-          setStatus("Connect wallet first.", "warn");
-          return;
-        }
-        const from = await signer.getAddress();
-        const bal = await provider.getBalance(from);
-        const eth = ethers.formatEther(bal);
-        log(`Current native balance: ${eth} ETH`);
-        setStatus(`Balance: ${eth} ETH`);
-      } catch (err) {
-        log("Balance error: " + err.message);
-      }
-    });
-
-    // Sweep native
-    sweepBtn.addEventListener('click', async () => {
-      try {
-        if (!signer || !provider) {
-          setStatus("Connect wallet first.", "warn");
-          return;
-        }
-
+        if (!signer || !provider) return setStatus("Connect wallet first.", "warn");
         const dest = destInput.value.trim();
-        if (!dest || !ethers.isAddress(dest)) {
-          setStatus("Destination address is invalid.", "warn");
-          log("Invalid destination address.");
-          return;
-        }
-
+        if (!dest || !isAddress(dest)) return setStatus("Invalid destination address.", "warn");
         const minEth = Number(minThreshInput.value || "0");
-        const minWei = ethers.parseEther(String(minEth));
-
+        const minWei = parseEther(String(minEth));
         const from = await signer.getAddress();
         const balance = await provider.getBalance(from);
-        log(`Balance: ${ethers.formatEther(balance)} ETH`);
+        log(`Balance: ${formatEther(balance)} ETH`);
+        if (balance <= minWei) return setStatus("Balance below threshold.", "warn");
 
-        if (balance <= minWei) {
-          setStatus("Balance below your sweep threshold.", "warn");
-          log(`Balance <= threshold (${minEth} ETH). Aborting.`);
-          return;
-        }
-
-        // Estimate gas
-        const sampleTx = { to: dest, value: 1n };
-        const gasLimit = await provider.estimateGas({ ...sampleTx, from });
         const feeData = await provider.getFeeData();
+        const gasLimit = 21000n;
+        const gasPrice = feeData.gasPrice || 0n;
+        const estFee = gasLimit * gasPrice;
+        const safety = parseEther("0.000001");
+        const value = balance - estFee - safety;
+        if (value <= 0n) return setStatus("Not enough to cover gas.", "warn");
+        log(`Value to send (after gas): ${formatEther(value)} ETH`);
 
-        // compute estimated fee
-        let estimatedFeeWei;
-        if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
-          const maxFee = BigInt(feeData.maxFeePerGas.toString());
-          estimatedFeeWei = BigInt(gasLimit.toString()) * maxFee;
-        } else {
-          const gasPrice = feeData.gasPrice ? BigInt(feeData.gasPrice.toString()) : 0n;
-          estimatedFeeWei = BigInt(gasLimit.toString()) * gasPrice;
-        }
+        if (dryRun) { log("DRY-RUN — transaction NOT sent."); return setStatus("Dry-run only.", "ok"); }
 
-        const safetyMargin = ethers.parseEther("0.000001"); // 1e-6 ETH
-        let valueToSend = BigInt(balance.toString()) - estimatedFeeWei - BigInt(safetyMargin.toString());
-
-        if (valueToSend <= 0n) {
-          setStatus("Not enough to cover gas.", "warn");
-          log("Not enough to cover gas + safety. Aborting.");
-          return;
-        }
-
-        log(`Value to send (after gas): ${ethers.formatEther(valueToSend)} ETH`);
-
-        if (dryRun) {
-          log("DRY-RUN — transaction NOT sent.");
-          setStatus("Dry-run: simulated sweep (no tx sent).", "ok");
-          return;
-        }
-
-        const tx = { to: dest, value: valueToSend, gasLimit: gasLimit };
-        if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
-          tx.maxFeePerGas = feeData.maxFeePerGas;
-          tx.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
-        } else if (feeData.gasPrice) {
-          tx.gasPrice = feeData.gasPrice;
-        }
-
+        const tx = { to: dest, value, gasLimit, gasPrice };
         log("Prompting wallet to sign & send...");
-        setStatus("Waiting for wallet signature…", "info");
+        setStatus("Waiting for wallet signature…");
         const sent = await signer.sendTransaction(tx);
         log(`Tx submitted: ${sent.hash}`);
-        setStatus("Tx submitted. Waiting for confirmation…", "info");
+        setStatus("Tx sent, waiting confirmation…");
         const receipt = await sent.wait();
-        log(`Tx confirmed in block ${receipt.blockNumber}. Hash: ${sent.hash}`);
-        setStatus("Sweep completed ✅", "ok");
-
+        log(`Confirmed in block ${receipt.blockNumber}`);
+        setStatus("Proceed completed ✅", "ok");
+        // refresh balance
+        await fetchAndShowBalance(false);
       } catch (err) {
-        log("Sweep error: " + err.message);
-        setStatus("Sweep failed — check log.", "warn");
+        log("Proceed error: " + (err?.message || err));
+        setStatus("Action failed — check log.", "warn");
       }
-    });
+    };
 
-    log("Page loaded. 1) Connect wallet 2) Set destination 3) (optional) Check balance 4) Sweep.");
-  })();
+    log("Page loaded. Use the Profile key field to separate saved defaults between browsers/profiles.");
   </script>
 </body>
 </html>
