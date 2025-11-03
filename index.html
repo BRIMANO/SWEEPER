@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Sweepbot — Secure Native Sweeper (v4.1 + profile keys)</title>
+  <title>Sweepbot — Secure Native Sweeper (v4.1 + profile keys + USD)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Move your testnet or mainnet funds safely to a secure wallet — runs 100% in-browser with no backend." />
   <style>
-    :root{
-      --bg:#0f172a;--muted:#94a3b8;--accent:#38bdf8;--danger:#f43f5e;
-    }
+    :root{ --bg:#0f172a;--muted:#94a3b8;--accent:#38bdf8;--danger:#f43f5e; }
     *{box-sizing:border-box}
     body{margin:0;background:radial-gradient(circle at top,#1f2937 0%,#020617 55%,#020617 100%);min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#e2e8f0;display:flex;flex-direction:column}
     header{backdrop-filter:blur(18px);background:rgba(2,6,23,0.35);border-bottom:1px solid rgba(148,163,184,0.1);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -35,6 +33,7 @@
     .small-btn{font-size:0.72rem;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,0.08);background:rgba(15,23,42,0.6);color:#e2e8f0;cursor:pointer}
     .meta-row{display:flex;gap:8px;align-items:center}
     .meta-row label{margin:0;font-size:0.72rem;color:var(--muted)}
+    .inline{display:inline-flex;align-items:center;gap:8px}
   </style>
 </head>
 <body>
@@ -77,8 +76,14 @@
       </div>
 
       <div style="margin-top:12px;">
-        <label for="minThresh">Amount (in ETH)</label>
-        <input id="minThresh" type="number" step="0.000001" value="0.01" />
+        <div class="meta-row">
+          <label for="minThresh">Amount (native)</label>
+          <div class="inline">
+            <input id="minThresh" type="number" step="0.000001" value="0.01" style="width:140px" />
+            <div id="nativeSymbol" class="muted">ETH</div>
+          </div>
+        </div>
+        <div id="usdRow" class="muted" style="margin-top:6px">≈ $<span id="usdEquivalent">0.00</span> USD</div>
         <p class="muted">If your wallet has less than this, the bot will skip.</p>
       </div>
 
@@ -134,12 +139,28 @@
     const saveDefaultBtn = document.getElementById('saveDefaultBtn');
     const clearDefaultBtn = document.getElementById('clearDefaultBtn');
     const profileKeyInput = document.getElementById('profileKey');
+    const usdEquivalentEl = document.getElementById('usdEquivalent');
+    const nativeSymbolEl = document.getElementById('nativeSymbol');
 
     // State
     let provider = null, signer = null, account = null, dryRun = true;
     let lastBalance = null, balanceTimer = null;
-    // default profile key (editable in UI)
     const DEFAULT_KEY = 'sweepbot_default_dest_v1';
+
+    const COINGECKO_IDS = {
+      '1': { id: 'ethereum', symbol: 'ETH' },
+      '56': { id: 'binancecoin', symbol: 'BNB' },
+      '137': { id: 'matic-network', symbol: 'MATIC' },
+      '10': { id: 'optimism', symbol: 'OP' },
+      '42161': { id: 'arbitrum', symbol: 'ARB' },
+      '43114': { id: 'avalanche-2', symbol: 'AVAX' },
+      '250': { id: 'fantom', symbol: 'FTM' },
+      '8453': { id: 'base', symbol: 'BASE' },
+      '11155111': { id: 'ethereum', symbol: 'ETH' } // Sepolia uses ETH as base
+    };
+
+    // cache for prices to avoid hammering API
+    const priceCache = {};
 
     const log = msg => {
       const line = `[${new Date().toLocaleTimeString()}] ${msg}\n`;
@@ -150,97 +171,87 @@
                              type==="warn" ? `<span class='tag-warn'>${msg}</span>` : msg;
     };
 
-    // Helper: get the active localStorage key (from input or default)
-    function getActiveKey() {
-      const k = (profileKeyInput.value || '').trim();
-      return k ? k : DEFAULT_KEY;
-    }
+    function getActiveKey() { const k = (profileKeyInput.value || '').trim(); return k ? k : DEFAULT_KEY; }
 
-    // Load saved default for active key on startup
     (function loadDefaultForActiveKey() {
       try {
         profileKeyInput.value = DEFAULT_KEY;
         const active = getActiveKey();
         const saved = localStorage.getItem(active);
-        if (saved) {
-          destInput.value = saved;
-          log(`Loaded saved secure address for profile key "${active}" (editable).`);
-        } else {
-          destInput.value = '';
-          log(`No saved address for profile key "${active}".`);
-        }
-      } catch (e) {
-        console.warn("localStorage read failed", e);
-      }
+        if (saved) { destInput.value = saved; log(`Loaded saved secure address for profile key "${active}" (editable).`); }
+        else { destInput.value = ''; log(`No saved address for profile key "${active}".`); }
+      } catch (e) { console.warn("localStorage read failed", e); }
     })();
 
-    // When profile key changes, reload the associated saved address
     profileKeyInput.addEventListener('change', () => {
       try {
         const key = getActiveKey();
         const saved = localStorage.getItem(key);
-        if (saved) {
-          destInput.value = saved;
-          log(`Loaded saved secure address for profile key "${key}".`);
-        } else {
-          destInput.value = '';
-          log(`No saved address for profile key "${key}".`);
-        }
-      } catch (e) {
-        console.warn(e);
-      }
+        if (saved) { destInput.value = saved; log(`Loaded saved secure address for profile key "${key}".`); }
+        else { destInput.value = ''; log(`No saved address for profile key "${key}".`); }
+      } catch (e) { console.warn(e); }
     });
 
-    // Save current dest to active key
     saveDefaultBtn.onclick = () => {
       const v = destInput.value.trim();
       if (!v) return alert("Paste the secure address into the box, then click Save.");
       if (!isAddress(v)) return alert("That doesn't look like a valid EVM address.");
-      try {
-        const active = getActiveKey();
-        localStorage.setItem(active, v);
-        log(`Secure address saved locally under key "${active}".`);
-        alert("Saved locally in this browser/profile.");
-      } catch (e) {
-        alert("Failed to save locally: " + e.message);
-      }
+      try { const active = getActiveKey(); localStorage.setItem(active, v); log(`Secure address saved locally under key "${active}".`); alert("Saved locally in this browser/profile."); }
+      catch (e) { alert("Failed to save locally: " + e.message); }
     };
 
-    // Clear saved dest for active key
     clearDefaultBtn.onclick = () => {
-      try {
-        const active = getActiveKey();
-        localStorage.removeItem(active);
-        destInput.value = '';
-        log(`Saved address cleared for profile key "${active}".`);
-        alert("Cleared saved address for this profile key.");
-      } catch (e) {
-        alert("Failed to clear: " + e.message);
-      }
+      try { const active = getActiveKey(); localStorage.removeItem(active); destInput.value = ''; log(`Saved address cleared for profile key "${active}".`); alert("Cleared saved address for this profile key."); }
+      catch (e) { alert("Failed to clear: " + e.message); }
     };
 
-    // Dry-run toggle
-    toggleDryRunBtn.onclick = () => {
-      dryRun = !dryRun;
-      dryRunState.textContent = dryRun ? "ON" : "OFF";
-      log(dryRun ? "Dry-run ENABLED — txs will NOT be sent." : "Dry-run DISABLED — txs WILL be sent if you proceed.");
-    };
+    toggleDryRunBtn.onclick = () => { dryRun = !dryRun; dryRunState.textContent = dryRun ? "ON" : "OFF"; log(dryRun ? "Dry-run ENABLED — txs will NOT be sent." : "Dry-run DISABLED — txs WILL be sent if you proceed."); };
 
-    // Network switching helper
     async function switchNetwork(chainId) {
-      try {
-        await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x" + Number(chainId).toString(16) }] });
-        log(`Switched to network ${chainId}`);
-      } catch (err) {
-        if (err && err.code === 4902) log(`Network ${chainId} not found in wallet. Add it manually.`);
-        else log(`Network switch error: ${err?.message || err}`);
-      }
+      try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x" + Number(chainId).toString(16) }] }); log(`Switched to network ${chainId}`); }
+      catch (err) { if (err && err.code === 4902) log(`Network ${chainId} not found in wallet. Add it manually.`); else log(`Network switch error: ${err?.message || err}`); }
     }
     networkSelect.onchange = () => {
       const chainId = networkSelect.value;
+      updateNativeSymbol(chainId);
       if (window.ethereum) switchNetwork(chainId);
       else log("Cannot switch network — no wallet detected.");
+      // update USD display for the current amount
+      updateUSDEquivalent();
     };
+
+    function updateNativeSymbol(chainId) {
+      const entry = COINGECKO_IDS[String(chainId)] || { symbol: 'NATIVE' };
+      nativeSymbolEl.textContent = entry.symbol || 'NATIVE';
+    }
+
+    async function fetchPriceUSD(coingeckoId) {
+      if (!coingeckoId) return null;
+      // cache for 30 seconds
+      const now = Date.now();
+      const cached = priceCache[coingeckoId];
+      if (cached && now - cached.t < 30000) return cached.p;
+      try {
+        const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(coingeckoId)}&vs_currencies=usd`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('Price fetch failed');
+        const j = await r.json();
+        const price = j[coingeckoId]?.usd ?? null;
+        priceCache[coingeckoId] = { p: price, t: now };
+        return price;
+      } catch (e) { console.warn('Price fetch error', e); return null; }
+    }
+
+    async function updateUSDEquivalent() {
+      const chainId = networkSelect.value;
+      const entry = COINGECKO_IDS[String(chainId)];
+      const amount = Number(minThreshInput.value || 0);
+      if (!entry || !amount) { usdEquivalentEl.textContent = '0.00'; return; }
+      const price = await fetchPriceUSD(entry.id);
+      if (price === null) { usdEquivalentEl.textContent = 'N/A'; return; }
+      const usd = amount * Number(price);
+      usdEquivalentEl.textContent = usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
     // Balance fetch
     async function fetchAndShowBalance(silent = false) {
@@ -248,14 +259,9 @@
       try {
         const bal = await provider.getBalance(account);
         const eth = formatEther(bal);
-        if (!silent || lastBalance === null || eth !== lastBalance) {
-          log(`Balance: ${eth} ETH`);
-          setStatus(`Balance: ${eth} ETH`, "ok");
-        }
+        if (!silent || lastBalance === null || eth !== lastBalance) { log(`Balance: ${eth} ${nativeSymbolEl.textContent}`); setStatus(`Balance: ${eth} ${nativeSymbolEl.textContent}`, "ok"); }
         lastBalance = eth;
-      } catch (err) {
-        if (!silent) log("Balance refresh error: " + err.message);
-      }
+      } catch (err) { if (!silent) log("Balance refresh error: " + err.message); }
     }
 
     // Connect wallet
@@ -270,23 +276,22 @@
         walletStatus.textContent = `Connected: ${account.slice(0,6)}…${account.slice(-4)} on ${net.name}`;
         log(`Connected to ${account} on ${net.name} (chainId ${net.chainId})`);
         setStatus("Wallet connected. You can proceed.", "ok");
-        sweepBtn.disabled = false;
-        checkBalanceBtn.disabled = false;
-        // auto-select dropdown
+        sweepBtn.disabled = false; checkBalanceBtn.disabled = false;
         [...networkSelect.options].forEach(opt => { if (Number(opt.value) === Number(net.chainId)) opt.selected = true; });
-        // show balance immediately
+        updateNativeSymbol(String(net.chainId));
         await fetchAndShowBalance(false);
-        // start auto refresh
         if (balanceTimer) clearInterval(balanceTimer);
         balanceTimer = setInterval(() => fetchAndShowBalance(true), 30000);
-      } catch (err) {
-        log("Connect error: " + (err?.message || err));
-        setStatus("Connect failed — see log.", "warn");
-      }
+        // refresh USD equivalent after connect
+        updateUSDEquivalent();
+      } catch (err) { log("Connect error: " + (err?.message || err)); setStatus("Connect failed — see log.", "warn"); }
     };
 
     // Manual balance check
     checkBalanceBtn.onclick = async () => { await fetchAndShowBalance(false); };
+
+    // Update USD when user edits amount
+    minThreshInput.addEventListener('input', () => updateUSDEquivalent());
 
     // Proceed / sweep
     sweepBtn.onclick = async () => {
@@ -298,7 +303,7 @@
         const minWei = parseEther(String(minEth));
         const from = await signer.getAddress();
         const balance = await provider.getBalance(from);
-        log(`Balance: ${formatEther(balance)} ETH`);
+        log(`Balance: ${formatEther(balance)} ${nativeSymbolEl.textContent}`);
         if (balance <= minWei) return setStatus("Balance below threshold.", "warn");
 
         const feeData = await provider.getFeeData();
@@ -308,7 +313,7 @@
         const safety = parseEther("0.000001");
         const value = balance - estFee - safety;
         if (value <= 0n) return setStatus("Not enough to cover gas.", "warn");
-        log(`Value to send (after gas): ${formatEther(value)} ETH`);
+        log(`Value to send (after gas): ${formatEther(value)} ${nativeSymbolEl.textContent}`);
 
         if (dryRun) { log("DRY-RUN — transaction NOT sent."); return setStatus("Dry-run only.", "ok"); }
 
@@ -321,15 +326,15 @@
         const receipt = await sent.wait();
         log(`Confirmed in block ${receipt.blockNumber}`);
         setStatus("Proceed completed ✅", "ok");
-        // refresh balance
         await fetchAndShowBalance(false);
-      } catch (err) {
-        log("Proceed error: " + (err?.message || err));
-        setStatus("Action failed — check log.", "warn");
-      }
+      } catch (err) { log("Proceed error: " + (err?.message || err)); setStatus("Action failed — check log.", "warn"); }
     };
 
-    log("Page loaded. Use the Profile key field to separate saved defaults between browsers/profiles.");
+    // initial native symbol + usd
+    updateNativeSymbol(networkSelect.value);
+    updateUSDEquivalent();
+
+    log("Page loaded. Use the Profile key field to separate saved defaults between browsers/profiles. USD equivalents are provided via CoinGecko.");
   </script>
 </body>
 </html>
